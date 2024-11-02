@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'pry'
-require 'pry-byebug'
 require 'diagrams/version'
 
 module Diagrams
@@ -10,7 +8,5 @@ module Diagrams
   require 'diagrams/resources'
 
   Resources.load_icons
-  Resources.clean_resources_md('docs')
-  Resources.build_resources_md('docs')
   include(Resources)
 end

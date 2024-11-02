@@ -57,6 +57,7 @@ module Diagrams
       @space = '  '
       @clen = CLUSTER_BGCOLORS.length
       @depth = 0
+      @cluster_idx = -1
     end
 
     def indent
@@ -74,7 +75,9 @@ module Diagrams
     end
 
     def begin_cluster(label, **attrs) # rubocop:disable Metrics/AbcSize
-      dot_output << "#{indent}subgraph cluster_#{identifier(label)} {\n"
+      cluster_label = label.empty? ? "cluster_#{@cluster_idx += 1}" : label
+
+      dot_output << "#{indent}subgraph cluster_#{identifier(cluster_label)} {\n"
       dot_output << "#{indent}    label=\"#{label}\";\n"
       dot_output << "#{indent}    bgcolor=\"#{CLUSTER_BGCOLORS[@depth % clen]}\";\n"
       CLUSTER_DEFAULTS.merge(attrs).each do |key, value|
@@ -95,7 +98,6 @@ module Diagrams
     def generate_image
       output_path = caller_locations.last.path.gsub('.rb', ".#{format}")
       dot_output << "}\n"
-      # puts(@dot_output)
       Tempfile.open('temp.dot') do |file|
         File.write(file.path, dot_output)
 

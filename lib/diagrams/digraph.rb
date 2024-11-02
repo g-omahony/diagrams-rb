@@ -1,9 +1,6 @@
 # frozen_string_literal: true
 
-require 'pry'
-
 module Diagrams
-  # DSL
   class Digraph
     def initialize(**attributes, &block)
       @graph = Dot.new(**attributes)
@@ -19,7 +16,7 @@ module Diagrams
       Array(from).each { |f| Array(to).each { |t| @graph.add_edge(f, to: t, **attributes) } }
     end
 
-    def cluster(label, **attributes, &block)
+    def cluster(label = '', **attributes, &block)
       @graph.begin_cluster(label, **attributes)
       instance_eval(&block)
       @graph.end_cluster

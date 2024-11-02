@@ -1,8 +1,5 @@
 # frozen_string_literal: true
 
-require 'pry'
-require 'pry-byebug'
-
 module Diagrams
   module Resources
     class << self
@@ -10,16 +7,13 @@ module Diagrams
         root = File.expand_path('../..', __dir__)
         base_path = "#{root}/resources"
 
-        # Traverse through the directory structure
         Dir.glob("#{base_path}/**/*.png").each do |file_path|
           relative_path = file_path.sub("#{base_path}/", '')
           path_parts = relative_path.split('/')
 
-          # Extract image name without extension
           image_name_with_extension = path_parts.pop
           image_name_without_extension = File.basename(image_name_with_extension, '.png')
 
-          # Traverse or create modules based on the directory structure
           current_module = self
           path_parts.each do |part|
             # Create or get the submodule dynamically
@@ -31,7 +25,6 @@ module Diagrams
             current_module = submodule
           end
 
-          # Define method for image access in the innermost module
           current_module.define_singleton_method(image_name_without_extension.gsub('-', '_')) do
             file_path
           end
