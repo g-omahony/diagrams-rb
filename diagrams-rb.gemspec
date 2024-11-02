@@ -9,16 +9,15 @@ Gem::Specification.new do |spec|
   spec.email = ['omahony.t.g@gmail.com']
 
   spec.summary = 'A Ruby DSL to construct cloud system architecture diagrams with Graphviz'
-  # spec.description = "TODO: Write a longer description or delete this line."
-  # spec.homepage = "TODO: Put your gem's website or public repo URL here."
+  spec.description = 'This Ruby-based DSL allows you to create complex Graphviz DOT diagrams programmatically.
+    With this DSL, you can define nodes, edges,
+    and nested clusters that represent relationships and hierarchies visually.'
+  spec.homepage = 'https://github.com/g-omahony/diagrams-rb'
   spec.license = 'MIT'
   spec.required_ruby_version = '>= 3.0.0'
 
-  # spec.metadata["allowed_push_host"] = "TODO: Set to your gem server 'https://example.com'"
-  #
-  # spec.metadata["homepage_uri"] = spec.homepage
-  # spec.metadata["source_code_uri"] = "TODO: Put your gem's public repo URL here."
-  # spec.metadata["changelog_uri"] = "TODO: Put your gem's CHANGELOG.md URL here."
+  spec.metadata['documentation_uri'] = 'https://g-omahony.github.io/diagrams-rb-docs'
+  spec.metadata['source_code_uri'] = 'https://github.com/g-omahony/diagrams-rb'
 
   # Specify which files should be added to the gem when it is released.
   # The `git ls-files -z` loads the files in the RubyGem that have been added into git.
