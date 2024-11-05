@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
-require "diagrams/rb"
+require 'pry'
+require 'pry-byebug'
+require "diagrams-rb"
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure
