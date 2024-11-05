@@ -7,7 +7,6 @@ RSpec.describe Diagrams::Digraph do
   end
 
   it 'creates defaults' do
-    binding.pry
-    expect(digraph).to be_nil
+    expect(digraph).to an_instance_of(described_class)
   end
 end
