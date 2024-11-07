@@ -16,7 +16,6 @@ module Diagrams
 
           current_module = self
           path_parts.each do |part|
-            # Create or get the submodule dynamically
             submodule = current_module.const_get(part.capitalize) rescue nil
             unless submodule
               submodule = Module.new

@@ -46,18 +46,22 @@ module Diagrams
       fontsize: '13'
     }.freeze
 
-    attr_accessor :dot_output, :format, :space, :clen
+    attr_accessor :format, :space, :clen, :test
 
     def initialize(**attrs)
-      @dot_output = "digraph G {\n".dup
       @format = attrs.delete(:format) || 'png'
+      @test = attrs.delete(:test)
       GRAPH_DEFAULTS.merge(attrs).each do |key, value|
-        @dot_output << "    #{key}=#{value};\n"
+        dot_output << "    #{key}=#{value};\n"
       end
       @space = '  '
       @clen = CLUSTER_BGCOLORS.length
       @depth = 0
       @cluster_idx = -1
+    end
+
+    def dot_output
+      @dot_output ||= "digraph G {\n".dup
     end
 
     def indent
@@ -96,8 +100,12 @@ module Diagrams
     end
 
     def generate_image
-      output_path = caller_locations.last.path.gsub('.rb', ".#{format}")
       dot_output << "}\n"
+
+      write_output
+    end
+
+    def write_output
       Tempfile.open('temp.dot') do |file|
         File.write(file.path, dot_output)
 
@@ -105,6 +113,10 @@ module Diagrams
         _, stderr, status = Open3.capture3(cmd)
         puts stderr unless status.success?
       end
+    end
+
+    def output_path
+      caller_locations.last.path.gsub('.rb', ".#{format}")
     end
   end
 end
