@@ -1,69 +1,106 @@
 # frozen_string_literal: true
 
 RSpec.describe Diagrams::Digraph do # rubocop:disable Metrics/BlockLength
-  let(:dot_output) do
-    <<~TEXT
-      digraph G {
-          pad=2.0;
-          splines=ortho;
-          nodesep=0.60;
-          ranksep=0.75;
-          rankdir=TB;
-          fontname="Sans-Serif";
-          fontsize=15;
-          fontcolor="#2D3436";
-      }
-    TEXT
-  end
-  let(:mock_tempfile) { instance_double(Tempfile, path: '/mock/tempfile/path') }
+  def capture_output(&block)
+    dot_instance = Diagrams::Dot.new(test: true)
 
-  before do
-    allow(Tempfile).to receive(:open).and_yield(mock_tempfile)
-    allow(File).to receive(:write).with(mock_tempfile.path, dot_output)
-    allow(Open3).to receive(:capture3).and_return(['', '', instance_double(Process::Status, success?: true)])
+    allow(Diagrams::Dot).to receive(:new).and_return(dot_instance)
+
+    described_class.new(test: true, &block)
+
+    dot_instance.generate_image
   end
 
-  def get_dot_out(digraph)
-    digraph.instance_variable_get(:@graph).dot_output
+  shared_examples 'a diagram' do |dsl_code, expected_output|
+    it 'generates the expected dot output' do
+      result = capture_output { instance_eval(&dsl_code) }
+      expected_output.each do |expected|
+        expect(result).to include(expected)
+      end
+    end
   end
 
-  describe 'empty Digraph with defaults' do
-    it 'writes dot output' do
-      digraph =
-        described_class.new do
+  context 'when adding a single node' do
+    include_examples(
+      'a diagram',
+      proc {
+        node 'A', label: 'Node A'
+      },
+      ['A [label="Node A"']
+    )
+  end
+
+  context 'when adding two nodes with an edge' do
+    include_examples(
+      'a diagram',
+      proc {
+        node 'A', label: 'Node A'
+        node 'B', label: 'Node B'
+        edge 'A', to: 'B'
+      },
+      [
+        'A [label="Node A"',
+        'B [label="Node B"',
+        'A -> B'
+      ]
+    )
+  end
+
+  context 'when adding a cluster with nodes' do
+    include_examples(
+      'a diagram',
+      proc {
+        cluster 'cluster 1' do
+          node 'A', label: 'Node A'
+          node 'B', label: 'Node B'
+          edge 'A', to: 'B'
         end
-      expect(get_dot_out(digraph)).to eq(dot_output)
-    end
+      },
+      [
+        'subgraph cluster_cluster_1 {',
+        'A [label="Node A"',
+        'B [label="Node B"',
+        'A -> B'
+      ]
+    )
   end
 
-  describe 'Digraph with a node' do # rubocop:disable Metrics/BlockLength
-    let(:dot_output) do
-      <<~TEXT
-        digraph G {
-            pad=2.0;
-            splines=ortho;
-            nodesep=0.60;
-            ranksep=0.75;
-            rankdir=TB;
-            fontname="Sans-Serif";
-            fontsize=15;
-            fontcolor="#2D3436";
-            #{node}
-        }
-      TEXT
-    end
-    let(:node) do
-      'node [label="node", image="/path/to/icon.png", shape=box,style=rounded,' \
-        'fixedsize=true,width=1.4,height=1.4,labelloc=b,imagescale=true,penwidth=0,' \
-        'fontname="Sans-Serif",fontsize=13,fontcolor="#2D3436"];'
-    end
-
-    it 'writes a node to the dot output' do
-      digraph =
-        described_class.new do
-          node :node, label: 'node', icon: '/path/to/icon.png'
+  context 'when nesting clusters' do
+    include_examples(
+      'a diagram',
+      proc {
+        cluster 'parent' do
+          cluster 'child' do
+            node 'C', label: 'Node C'
+          end
+          node 'D', label: 'Node D'
         end
-      expect(get_dot_out(digraph)).to eq(dot_output)
-    end
+      },
+      [
+        'subgraph cluster_parent {',
+        'subgraph cluster_child {',
+        'C [label="Node C"',
+        'D [label="Node D"'
+      ]
+    )
+  end
+
+  context 'when nodes are inside and outside clusters' do
+    include_examples(
+      'a diagram',
+      proc {
+        cluster 'main' do
+          node 'X', label: 'Node X'
+        end
+        node 'Y', label: 'Node Y'
+        edge 'X', to: 'Y'
+      },
+      [
+        'subgraph cluster_main {',
+        'X [label="Node X"',
+        'Y [label="Node Y"',
+        'X -> Y'
+      ]
+    )
   end
 end

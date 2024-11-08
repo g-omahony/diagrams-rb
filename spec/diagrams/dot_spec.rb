@@ -21,9 +21,8 @@ RSpec.describe Diagrams::Dot do # rubocop:disable Metrics/BlockLength
 
   describe 'add_node' do
     let(:default_node) do
-      'default_node [label="", image="", shape=box,style=rounded,fixedsize=true,width=1.4,'\
-        'height=1.4,labelloc=b,imagescale=true,penwidth=0,fontname="Sans-Serif",'\
-        'fontsize=13,fontcolor="#2D3436"];'
+      'default_node [label="", image="", shape=box,style=rounded,fixedsize=true,width=1.4,height=1.4,' \
+      'labelloc=b,imagescale=true,penwidth=0,fontname="Sans-Serif",fontsize=13,fontcolor="#2D3436"];'
     end
     let(:label) { 'Node Label' }
     let(:icon) { 'path/to/icon.png' }

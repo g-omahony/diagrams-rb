@@ -101,6 +101,7 @@ module Diagrams
 
     def generate_image
       dot_output << "}\n"
+      return dot_output if test
 
       write_output
     end
