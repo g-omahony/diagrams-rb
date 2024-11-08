@@ -71,16 +71,16 @@ RSpec.describe Diagrams::Digraph do # rubocop:disable Metrics/BlockLength
       proc {
         cluster 'parent' do
           cluster 'child' do
-            node 'C', label: 'Node C'
+            node 'A', label: 'Node A'
           end
-          node 'D', label: 'Node D'
+          node 'B', label: 'Node B'
         end
       },
       [
         'subgraph cluster_parent {',
         'subgraph cluster_child {',
-        'C [label="Node C"',
-        'D [label="Node D"'
+        'A [label="Node A"',
+        'B [label="Node B"'
       ]
     )
   end
@@ -90,16 +90,16 @@ RSpec.describe Diagrams::Digraph do # rubocop:disable Metrics/BlockLength
       'a diagram',
       proc {
         cluster 'main' do
-          node 'X', label: 'Node X'
+          node 'A', label: 'Node A'
         end
-        node 'Y', label: 'Node Y'
-        edge 'X', to: 'Y'
+        node 'B', label: 'Node B'
+        edge 'A', to: 'B'
       },
       [
         'subgraph cluster_main {',
-        'X [label="Node X"',
-        'Y [label="Node Y"',
-        'X -> Y'
+        'A [label="Node A"',
+        'B [label="Node B"',
+        'A -> B'
       ]
     )
   end

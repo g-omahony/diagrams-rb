@@ -5,45 +5,47 @@ require 'tempfile'
 
 module Diagrams
   class Dot
-    GRAPH_DEFAULTS = {
-      pad: '2.0',
-      splines: 'ortho',
-      nodesep: '0.60',
-      ranksep: '0.75',
-      rankdir: 'TB',
-      fontname: '"Sans-Serif"',
-      fontsize: '15',
-      fontcolor: '"#2D3436"'
-    }.freeze
+    DEFAULTS = {
+      GRAPH: {
+        pad: '2.0',
+        splines: 'ortho',
+        nodesep: '0.60',
+        ranksep: '0.75',
+        rankdir: 'TB',
+        fontname: '"Sans-Serif"',
+        fontsize: '15',
+        fontcolor: '"#2D3436"'
+      },
 
-    NODE_DEFAULTS = {
-      shape: 'box',
-      style: 'rounded',
-      fixedsize: 'true',
-      width: '1.4',
-      height: '1.4',
-      labelloc: 'b',
-      imagescale: 'true',
-      penwidth: '0',
-      fontname: '"Sans-Serif"',
-      fontsize: '13',
-      fontcolor: '"#2D3436"'
-    }.freeze
+      NODE: {
+        shape: 'box',
+        style: 'rounded',
+        fixedsize: 'true',
+        width: '1.4',
+        height: '1.4',
+        labelloc: 'b',
+        imagescale: 'true',
+        penwidth: '0',
+        fontname: '"Sans-Serif"',
+        fontsize: '13',
+        fontcolor: '"#2D3436"'
+      },
 
-    CLUSTER_DEFAULTS = {
-      shape: 'box',
-      style: 'rounded',
-      labeljust: 'l',
-      pencolor: '"#AEB6BE"'
-    }.freeze
+      CLUSTER: {
+        shape: 'box',
+        style: 'rounded',
+        labeljust: 'l',
+        pencolor: '"#AEB6BE"'
+      },
 
-    CLUSTER_BGCOLORS = %w[#E5F5FD #EBF3E7 #ECE8F6 #FDF7E3].freeze
+      CLUSTER_BGCOLORS: %w[#E5F5FD #EBF3E7 #ECE8F6 #FDF7E3],
 
-    EDGE_DEFAULTS = {
-      color: '"#7B8894"',
-      fontcolor: '"#2D3436"',
-      fontname: '"Sans-Serif"',
-      fontsize: '13'
+      EDGE: {
+        color: '"#7B8894"',
+        fontcolor: '"#2D3436"',
+        fontname: '"Sans-Serif"',
+        fontsize: '13'
+      }
     }.freeze
 
     attr_accessor :format, :space, :clen, :test
@@ -51,11 +53,11 @@ module Diagrams
     def initialize(**attrs)
       @format = attrs.delete(:format) || 'png'
       @test = attrs.delete(:test)
-      GRAPH_DEFAULTS.merge(attrs).each do |key, value|
+      DEFAULTS[:GRAPH].merge(attrs).each do |key, value|
         dot_output << "    #{key}=#{value};\n"
       end
       @space = '  '
-      @clen = CLUSTER_BGCOLORS.length
+      @clen = DEFAULTS[:CLUSTER_BGCOLORS].length
       @depth = 0
       @cluster_idx = -1
     end
@@ -69,12 +71,12 @@ module Diagrams
     end
 
     def add_node(id, label: '', icon: nil, **attrs)
-      attributes = NODE_DEFAULTS.merge(attrs).map { |k, v| "#{k}=#{v}" }.join(',')
+      attributes = DEFAULTS[:NODE].merge(attrs).map { |k, v| "#{k}=#{v}" }.join(',')
       dot_output << "#{indent}    #{id} [label=\"#{label}\", image=\"#{icon}\", #{attributes}];\n"
     end
 
     def add_edge(from, to:, **attrs)
-      attributes = EDGE_DEFAULTS.merge(attrs).map { |k, v| "#{k}=#{v}" }.join(',')
+      attributes = DEFAULTS[:EDGE].merge(attrs).map { |k, v| "#{k}=#{v}" }.join(',')
       dot_output << "    #{from} -> #{to} [#{attributes}];\n"
     end
 
@@ -83,8 +85,8 @@ module Diagrams
 
       dot_output << "#{indent}subgraph cluster_#{identifier(cluster_label)} {\n"
       dot_output << "#{indent}    label=\"#{label}\";\n"
-      dot_output << "#{indent}    bgcolor=\"#{CLUSTER_BGCOLORS[@depth % clen]}\";\n"
-      CLUSTER_DEFAULTS.merge(attrs).each do |key, value|
+      dot_output << "#{indent}    bgcolor=\"#{DEFAULTS[:CLUSTER_BGCOLORS][@depth % clen]}\";\n"
+      DEFAULTS[:CLUSTER].merge(attrs).each do |key, value|
         dot_output << "#{indent}   #{key}=#{value};\n"
       end
       @depth += 1

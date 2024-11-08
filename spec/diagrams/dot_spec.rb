@@ -44,4 +44,8 @@ RSpec.describe Diagrams::Dot do # rubocop:disable Metrics/BlockLength
       expect(described_class.new.add_node(:node, fillcolor: fillcolor).include?(fillcolor)).to be_truthy
     end
   end
+
+  describe 'add_cluster' do
+
+  end
 end
