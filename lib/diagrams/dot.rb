@@ -6,6 +6,7 @@ require 'tempfile'
 module Diagrams
   class Dot
     DEFAULTS = {
+
       GRAPH: {
         pad: '2.0',
         splines: 'ortho',
@@ -46,28 +47,19 @@ module Diagrams
         fontname: '"Sans-Serif"',
         fontsize: '13'
       }
+
     }.freeze
 
-    attr_accessor :format, :space, :clen, :test
+    attr_accessor :format, :space, :bg_color_len
 
     def initialize(**attrs)
       @format = attrs.delete(:format) || 'png'
       @test = attrs.delete(:test)
-      DEFAULTS[:GRAPH].merge(attrs).each do |key, value|
-        dot_output << "    #{key}=#{value};\n"
-      end
       @space = '  '
-      @clen = DEFAULTS[:CLUSTER_BGCOLORS].length
+      @bg_color_len = DEFAULTS[:CLUSTER_BGCOLORS].length
       @depth = 0
       @cluster_idx = -1
-    end
-
-    def dot_output
-      @dot_output ||= "digraph G {\n".dup
-    end
-
-    def indent
-      space * @depth
+      write_digraph_default(attrs)
     end
 
     def add_node(id, label: '', icon: nil, **attrs)
@@ -85,11 +77,12 @@ module Diagrams
 
       dot_output << "#{indent}subgraph cluster_#{identifier(cluster_label)} {\n"
       dot_output << "#{indent}    label=\"#{label}\";\n"
-      dot_output << "#{indent}    bgcolor=\"#{DEFAULTS[:CLUSTER_BGCOLORS][@depth % clen]}\";\n"
+      dot_output << "#{indent}    bgcolor=\"#{DEFAULTS[:CLUSTER_BGCOLORS][@depth % bg_color_len]}\";\n"
       DEFAULTS[:CLUSTER].merge(attrs).each do |key, value|
-        dot_output << "#{indent}   #{key}=#{value};\n"
+        dot_output << "#{indent}    #{key}=#{value};\n"
       end
       @depth += 1
+      @dot_output
     end
 
     def end_cluster
@@ -97,15 +90,31 @@ module Diagrams
       @depth -= 1
     end
 
-    def identifier(string)
-      string.gsub(/\s+/, '_')
-    end
-
     def generate_image
       dot_output << "}\n"
-      return dot_output if test
+      return dot_output if @test
 
       write_output
+    end
+
+    private
+
+    def dot_output
+      @dot_output ||= "digraph G {\n".dup
+    end
+
+    def write_digraph_default(attrs)
+      DEFAULTS[:GRAPH].merge(attrs).each do |key, value|
+        dot_output << "    #{key}=#{value};\n"
+      end
+    end
+
+    def indent
+      space * @depth
+    end
+
+    def identifier(string)
+      string.gsub(/\s+/, '_')
     end
 
     def write_output
