@@ -4,7 +4,7 @@ require 'open3'
 require 'tempfile'
 
 module Diagrams
-  class Dot
+  class Dot # rubocop:disable Metrics/ClassLength
     DEFAULTS = {
 
       GRAPH: {
@@ -46,7 +46,9 @@ module Diagrams
         fontcolor: '"#2D3436"',
         fontname: '"Sans-Serif"',
         fontsize: '13'
-      }
+      },
+
+      PADDING: 0.45
 
     }.freeze
 
@@ -63,7 +65,7 @@ module Diagrams
     end
 
     def add_node(id, label: '', icon: nil, **attrs)
-      attributes = DEFAULTS[:NODE].merge(attrs).map { |k, v| "#{k}=#{v}" }.join(',')
+      attributes = DEFAULTS[:NODE].merge(attrs.merge(height: node_height(label))).map { |k, v| "#{k}=#{v}" }.join(',')
       dot_output << "#{indent}    #{id} [label=\"#{label}\", image=\"#{icon}\", #{attributes}];\n"
     end
 
@@ -111,6 +113,10 @@ module Diagrams
 
     def indent
       space * @depth
+    end
+
+    def node_height(label)
+      (DEFAULTS[:NODE][:height].to_f + (DEFAULTS[:PADDING] * label.split("\\n").size)).round(1).to_s
     end
 
     def identifier(string)
