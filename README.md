@@ -11,7 +11,7 @@ With this DSL, you can define nodes, edges, and nested clusters that represent r
 Add this line to your application's Gemfile:
 
 ```Ruby
-gem 'diagrams-rb', '~> 0.1'
+gem 'diagrams-rb', '~> 0.0.3'
 ```
 
 or install:
